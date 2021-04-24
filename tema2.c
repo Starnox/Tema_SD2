@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
             // TODO decrement the other ranks in the top
             RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
         }
+        
         else if(strcmp(command, "watch") == 0)
         {
             printf("dsa");
@@ -122,11 +123,11 @@ int main(int argc, char *argv[])
     }
 
     free(command);
-    DestroyList(&all, FreeSeries, 1);
-    DestroyList(&tendinte, FreeSeries, 0);
-    DestroyList(&documentare, FreeSeries, 0);
-    DestroyList(&tutoriale, FreeSeries, 0);
-    DestroyList(&top10, FreeSeries, 0);
+    DestroyList(&all, FreeSeries, 0);
+    DestroyList(&tendinte, FreeSeries, 1);
+    DestroyList(&documentare, FreeSeries, 1);
+    DestroyList(&tutoriale, FreeSeries, 1);
+    DestroyList(&top10, FreeSeries, 1);
     ClearQueue(watch_later, FreeSeries);
     ClearStack(currently_watching, FreeSeries);
     ClearStack(history, FreeSeries);
