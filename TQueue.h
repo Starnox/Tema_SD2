@@ -1,6 +1,7 @@
 #include "TLista.h"
 
-
+#ifndef TQUEUE_H
+#define TQUEUE_H
 typedef struct queue
 {
     int count;
@@ -8,8 +9,10 @@ typedef struct queue
     TNodePointer back;
 }TQueue, *TQueuePointer;
 
-void InitialiseQueue(TQueuePointer queue); // initialise an empty queue
+TQueuePointer InitialiseQueue(); // initialise an empty queue
 int IsEmptyQueue(TQueuePointer queue); // check if empty
 int QueuePush(TQueuePointer queue, void *info); // 1 for succes 0 for failure
-void* QueuePop(TQueuePointer queue, FreeInfoFunction freeFunc);
+void* QueuePop(TQueuePointer queue);
 void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc);
+
+#endif

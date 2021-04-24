@@ -1,9 +1,11 @@
 #include "TQueue.h"
-#include "TStack.h"
 #include "TSeason.h"
+#include "string.h"
 
 #define DIM_MAX 100
 
+#ifndef TSERIES_H
+#define TSERIES_H
 typedef struct Series
 {
     int id;
@@ -17,4 +19,6 @@ typedef struct Series
 void FreeSeries(void *info);
 TSeriesPointer InitialiseSeries(int id, char *name, double rating, int nrSeasons);
 int AddSeason(TSeriesPointer series,  TSeasonPointer season);
-char* CreateDisplayString(TSeriesPointer series);
+void DisplaySeries(FILE *outputFILE ,void *series);
+
+#endif

@@ -4,6 +4,7 @@ void FreeSeason(void* info)
 {
     TSeasonPointer  seasonInfo = (TSeasonPointer) info;
     ClearQueue(seasonInfo->episodes, free);
+    free(seasonInfo);
 }
 
 TSeasonPointer InitialiseSeason(int numberOfEpisodes)
@@ -16,14 +17,14 @@ TSeasonPointer InitialiseSeason(int numberOfEpisodes)
     }
 
     season->numberOfEpisodes = numberOfEpisodes;
-    InitialiseQueue(season->episodes);
+    season->episodes = InitialiseQueue();
 
     return season;
 }
 
 int AddEpisode(TSeasonPointer season, TEpisodePointer episode)
 {
-    int result = QueuePush(season->episodes,(void *) episode);
+    int result = QueuePush(season->episodes, episode);
     if(result == 0)
     {
         printf("Episodul nu a putut fi adaugat");

@@ -1,10 +1,13 @@
 #include "TQueue.h"
 
-void InitialiseQueue(TQueuePointer queue)
+TQueuePointer InitialiseQueue()
 {
+    TQueuePointer queue = (TQueuePointer) malloc(sizeof(TQueue));
     queue->count = 0;
     queue->front = NULL;
     queue->back = NULL;
+
+    return queue;
 }
 
 int IsEmptyQueue(TQueuePointer queue)
@@ -37,16 +40,22 @@ int QueuePush(TQueuePointer queue, void *info)
     return 1;
 }
 
-void* QueuePop(TQueuePointer queue, FreeInfoFunction freeFunc)
+
+// just returns the info, the memory needs to be free manually
+void* QueuePop(TQueuePointer queue)
 {
     if(!IsEmptyQueue(queue))
     {
-        TNodePointer aux;
         void *info = queue->front->info;
-        aux = queue->front;
+        TNodePointer aux = queue->front;
         queue->front = queue->front->next;
         queue->count--;
-        DestroyNode(&aux, freeFunc);
+        if(queue->front == NULL) // if the queue is empty
+        {
+            queue->back = NULL;
+        }
+        free(aux);
+        aux = NULL;
         return info;
     }
     return NULL;
@@ -56,6 +65,9 @@ void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc)
 {
     while(!IsEmptyQueue(queue))
     {
-        QueuePop(queue, freeFunc);
+        void *info = QueuePop(queue);
+        freeFunc(info);
     }
+    free(queue);
+    queue = NULL;
 }

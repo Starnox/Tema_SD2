@@ -1,6 +1,15 @@
 #include "TStack.h"
 
 
+TStackPointer InitialiseStack()
+{
+    TStackPointer stack = (TStackPointer) malloc(sizeof(TStack));
+    stack->count = 0;
+    stack->top = NULL;
+
+    return stack;
+}
+
 int PushStack(TStackPointer stack, void *info)
 {
     TNodePointer aux;
@@ -22,7 +31,7 @@ int IsEmptyStack(TStackPointer stack)
     return (stack->top == NULL);
 }
 
-void* PopStack(TStackPointer stack, FreeInfoFunction freeFunc)
+void* PopStack(TStackPointer stack)
 {
     if(!IsEmptyStack(stack))
     {
@@ -31,8 +40,9 @@ void* PopStack(TStackPointer stack, FreeInfoFunction freeFunc)
         void *info = aux->info;
         stack->top = stack->top->next;
         stack->count--;
-        DestroyNode(&aux,freeFunc);
 
+        free(aux);
+        aux = NULL;
         return info;
     }
     else
@@ -44,7 +54,10 @@ void ClearStack(TStackPointer stack, FreeInfoFunction freeFunc)
 {
     while(!IsEmptyStack(stack))
     {
-        PopStack(stack, freeFunc);
+        void *info = PopStack(stack);
+        freeFunc(info);
     }
+    free(stack);
+    stack = NULL;
 }
 

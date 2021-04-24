@@ -5,7 +5,9 @@ void FreeSeries(void *info)
     TSeriesPointer infoSeries = (TSeriesPointer) info;
     free(infoSeries->name);
     infoSeries->name = NULL;
-    ClearQueue(infoSeries->nrSeasons, FreeSeason);
+    ClearQueue(infoSeries->seasons, FreeSeason);
+    free(infoSeries);
+    infoSeries = NULL;
 }
 
 int AddSeason(TSeriesPointer series,  TSeasonPointer season)
@@ -35,15 +37,13 @@ TSeriesPointer InitialiseSeries(int id, char *name, double rating, int nrSeasons
     newSeries->rating = rating;
     newSeries->nrSeasons = nrSeasons;
 
-    InitialiseQueue(newSeries->seasons); // initialise the queue
+    newSeries->seasons = InitialiseQueue(); // initialise the queue
 
     return newSeries;
 }
 
-char* DisplaySeries(TSeriesPointer series)
+void DisplaySeries(FILE *outputFILE ,void *series)
 {
-    char *result = (char) malloc(sizeof(char) * DIM_MAX);
-    sprintf(result,"(<%s>, <%lf>)", series->name, series->rating);
-
-    return result; // TODO free the memory
+    TSeriesPointer seriesInfo = (TSeriesPointer) series;
+    fprintf(outputFILE,"(<%s>, <%.1f>)", seriesInfo->name, seriesInfo->rating);
 }
