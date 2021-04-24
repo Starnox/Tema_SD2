@@ -47,73 +47,89 @@ int main(int argc, char *argv[])
             OrdererdInsert(&all, newSeries, CompareSeries, &position);
 
         }
-        if(strcmp(command, "show") == 0)
+        else if(strcmp(command, "show") == 0)
         {
-            int index;
-            fscanf(inputFile ,"%d", &index);
-            fprintf(outputFile, "Categoria %d: ", index);
-            if(index == 1)
+            char category[DIM_MAX];
+            fscanf(inputFile ,"%s", category);
+            fprintf(outputFile, "Categoria %s: ", category);
+            if(strcmp(category, "1") == 0)
                 DisplayList(tendinte, DisplaySeries, outputFile);
-            else if(index == 2)
+
+            else if(strcmp(category, "2") == 0)
                 DisplayList(documentare, DisplaySeries, outputFile);    
-            else if(index == 3)
+
+            else if(strcmp(category, "3") == 0)
                 DisplayList(tutoriale, DisplaySeries, outputFile);
-            else if(index == 4)
+
+            else if(strcmp(category, "top10") == 0)
                 DisplayList(top10, DisplaySeries, outputFile);
+
+            else if(strcmp(category, "later") == 0)
+                DisplayQueue(watch_later, DisplaySeries, outputFile);
+
+            else if(strcmp(category, "watching") == 0)
+                DisplayStack(currently_watching, DisplaySeries, outputFile);
+
+            else if(strcmp(category, "history") == 0)
+                DisplayStack(history, DisplaySeries, outputFile);
+
         }
-        if(strcmp(command, "add_sez") == 0)
+        else if(strcmp(command, "add_sez") == 0)
         {
             char name[DIM_MAX];
             fscanf(inputFile,"%s",name);
             
             // search through all the lists for the series with the given name
-            TSeriesPointer currSeries = FindElement(tendinte, name, MyFindFunction);
+            TSeriesPointer currSeries = (TSeriesPointer) FindElement(all, name, MyFindFunction);
             if(currSeries != NULL)
             {
-                printf("dsa");
+                TSeasonPointer newSeason = ReadSeason(inputFile);
+                AddSeason(currSeries, newSeason);
+                fprintf(outputFile,"Serialul %s are un sezon nou.\n", currSeries->name);
             }
-            // tendinte
-            
+        }
+        else if(strcmp(command, "later") == 0)
+        {
+            char name[DIM_MAX];
+            fscanf(inputFile, "%s", name);
+
+            // search in all
+            TSeriesPointer currSeries = (TSeriesPointer) FindElement(all, name, MyFindFunction);
+            if(currSeries != NULL)
+            {
+                // push the information in to the queue
+                QueuePush(watch_later, currSeries);
+                fprintf(outputFile, "Serialul %s se afla in coada de asteptare pe pozitia %d.\n",
+                currSeries->name, watch_later->count);
+            }
+
+            // remove the nodes from all the other lits
+            RemoveFromList(&tendinte, currSeries, FindFunctionForTwoNodes);
+            RemoveFromList(&documentare, currSeries, FindFunctionForTwoNodes);
+            RemoveFromList(&tutoriale, currSeries, FindFunctionForTwoNodes);
+
+            // TODO decrement the other ranks in the top
+            RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
+        }
+        else if(strcmp(command, "watch") == 0)
+        {
+            printf("dsa");
+        }
+        else if(strcmp(command, "add_top") == 0)
+        {
+            printf("dsad");
         }
     }
 
-
-    /*    
-    TSeriesPointer test_series = InitialiseSeries(1,"ducu",8.9,3);
-    TSeriesPointer test_series2 = InitialiseSeries(2,"ducu2", 9,2);
-
-    QueuePush(watch_later, test_series);
-    QueuePush(watch_later, test_series2);
-
-    while(!IsEmptyQueue(watch_later))
-    {
-        void *info = QueuePop(watch_later);
-        printf("%lf\n", ((TSeriesPointer)info)->rating);
-        FreeSeries(info);
-    }
-
-    PushStack(currently_watching, test_series);
-    PushStack(currently_watching, test_series2);
-
-    while(!IsEmptyStack(currently_watching))
-    {
-        void *info = PopStack(currently_watching);
-        printf("%lf\n", ((TSeriesPointer)info)->rating);
-        FreeSeries(info);
-    }
-    */
-
-    
-
     free(command);
-    ClearQueue(watch_later, FreeSeries);
-    ClearStack(currently_watching, FreeSeries);
-    ClearStack(history, FreeSeries);
     DestroyList(&all, FreeSeries, 1);
     DestroyList(&tendinte, FreeSeries, 0);
     DestroyList(&documentare, FreeSeries, 0);
     DestroyList(&tutoriale, FreeSeries, 0);
     DestroyList(&top10, FreeSeries, 0);
+    ClearQueue(watch_later, FreeSeries);
+    ClearStack(currently_watching, FreeSeries);
+    ClearStack(history, FreeSeries);
     fclose(inputFile);
     fclose(outputFile);
     return 0;
@@ -125,6 +141,19 @@ int MyFindFunction(void *a, void *b)
 {
     TSeriesPointer aInfo = (TSeriesPointer) a;
     if(strcmp(aInfo->name, (char *) b) == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+int FindFunctionForTwoNodes(void *a, void *b)
+{
+    TSeriesPointer aInfo = (TSeriesPointer) a,
+                    bInfo = (TSeriesPointer) b;
+
+    if(strcmp(aInfo->name, bInfo->name) == 0)
     {
         return 1;
     }

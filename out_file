@@ -11,3 +11,8 @@ Serialul WAL a fost adaugat la pozitia 2.
 Serialul PUR a fost adaugat la pozitia 3.
 Categoria 2: [(<HAR>, <9.4>), (<ARE>, <8.1>), (<PUR>, <5.6>)].
 Categoria 3: [(<ITP>, <9.9>), (<WAL>, <5.4>), (<QUE>, <2.6>)].
+Serialul JAP are un sezon nou.
+Categoria 1: [(<DIR>, <8.1>), (<JAP>, <8.1>), (<CAR>, <6.3>)].
+Serialul JAP se afla in coada de asteptare pe pozitia 1.
+Categoria 1: [(<DIR>, <8.1>), (<CAR>, <6.3>)].
+Categoria later: [(<JAP>, <8.1>)].

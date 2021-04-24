@@ -41,7 +41,7 @@ void* FindElement(TNodePointer node, void *toFind,  FindFunction findFunction)
     {
         if(findFunction(node->info, toFind) == 1)
         {
-            return node;
+            return node->info;
         }
         node = node->next;
     }
@@ -62,6 +62,35 @@ void DisplayList(TNodePointer node, ShowInfoFunction showFunc, FILE *outputFILE)
         node = node->next;
     }
     fprintf(outputFILE,"].\n");
+}
+
+// remove from the list the node with the specified info without freeing the info
+void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction)
+{
+    // search for the node
+    TNodePointer aux = *node;
+    if(aux == NULL)
+        return;
+
+    // if it is the first node
+    if(findFunction(aux->info, info) == 1)
+    {
+        *node = (*node)->next;
+        free(aux);
+        return;
+    }
+
+    while(aux->next != NULL)
+    {
+        if(findFunction(aux->next->info, info) == 1)
+        {
+            TNodePointer u = aux->next;
+            aux->next = aux->next->next;
+            free(u);
+            return;
+        }
+        aux = aux->next;
+    }
 
 }
 

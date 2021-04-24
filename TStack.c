@@ -50,6 +50,12 @@ void* PopStack(TStackPointer stack)
     
 }
 
+void DisplayStack(TStackPointer stack, ShowInfoFunction showFunc, FILE *outputFILE)
+{
+    TNodePointer node = stack->top;
+    DisplayList(node, showFunc, outputFILE);
+}
+
 void ClearStack(TStackPointer stack, FreeInfoFunction freeFunc)
 {
     while(!IsEmptyStack(stack))

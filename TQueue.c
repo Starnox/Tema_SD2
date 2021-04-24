@@ -41,6 +41,12 @@ int QueuePush(TQueuePointer queue, void *info)
 }
 
 
+void DisplayQueue(TQueuePointer queue, ShowInfoFunction showFunc, FILE *outputFILE)
+{
+    TNodePointer node = queue->front;
+    DisplayList(node, showFunc, outputFILE);
+}
+
 // just returns the info, the memory needs to be free manually
 void* QueuePop(TQueuePointer queue)
 {
