@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     FILE *outputFile = fopen(argv[2], "w");
 
     TNodePointer tendinte = NULL, documentare = NULL, tutoriale = NULL,
-                top10 = NULL, all = NULL;
+                top10 = NULL, all = NULL, residuu = NULL;
 
     // all -o lista cu toate serialele
 
@@ -198,7 +198,9 @@ int main(int argc, char *argv[])
             OrdererdInsert(&top10, newSeries, CompareSeriesFromTop, &position);
 
             // Check if there are more than 10 series in the top
-            VerifyIntegrity(top10);
+            TSeriesPointer toEliminate = VerifyIntegrity(top10);
+            if(toEliminate != NULL)
+                OrdererdInsert(&residuu, toEliminate, CompareSeries, &position);
             ReadjustOrder(top10);
 
             
@@ -216,6 +218,7 @@ int main(int argc, char *argv[])
     DestroyList(&documentare, FreeSeries, 1);
     DestroyList(&tutoriale, FreeSeries, 1);
     DestroyList(&top10, FreeSeries, 1);
+    DestroyList(&residuu, FreeSeries, 1);
     ClearQueue(watch_later, FreeSeries);
     ClearStack(currently_watching, FreeSeries);
     ClearStack(history, FreeSeries);
@@ -238,7 +241,7 @@ void ReadjustOrder(TNodePointer node)
     }
 }
 
-void VerifyIntegrity(TNodePointer node)
+TSeriesPointer VerifyIntegrity(TNodePointer node)
 {
     TNodePointer pre = NULL;
     int index = 0;
@@ -247,14 +250,16 @@ void VerifyIntegrity(TNodePointer node)
         index++;
         if(index == 11)
         {
+            TSeriesPointer info = node->info;
             // delete this node and free the info
             DestroyNode(&node, FreeSeries, 0);
             pre->next = NULL;
-            return;
+            return info;
         }
         pre = node;
         node = node->next;
     }
+    return NULL;
 }
 
 int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)

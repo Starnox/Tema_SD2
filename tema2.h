@@ -17,4 +17,4 @@ void ReadjustOrder(TNodePointer node);
 // returns 1 if we watched the whole series, 0 otherwise
 int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile);
 
-void VerifyIntegrity(TNodePointer node);
+TSeriesPointer VerifyIntegrity(TNodePointer node);

@@ -7,6 +7,7 @@ void DestroyNode(TNodePointer *node, FreeInfoFunction freeFunc, int destroyInfo)
         if(destroyInfo == 1)
             freeFunc((*node)->info);
         free(*node);
+        *node = NULL;
     }
 }
 
