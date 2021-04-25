@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "tseries.h": "c"
+        "tseries.h": "c",
+        "typeinfo": "c"
     }
 }

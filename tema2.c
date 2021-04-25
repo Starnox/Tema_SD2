@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
                 OrdererdInsert(&tutoriale, newSeries, CompareSeries, &position);
 
             fprintf(outputFile,"Serialul %s a fost adaugat la pozitia %d.\n", newSeries->name, position);
+            
+            // insert in the all list which contains all the series
             OrdererdInsert(&all, newSeries, CompareSeries, &position);
 
         }
@@ -52,6 +54,8 @@ int main(int argc, char *argv[])
             char category[DIM_MAX];
             fscanf(inputFile ,"%s", category);
             fprintf(outputFile, "Categoria %s: ", category);
+
+            // check for the category and display the list
             if(strcmp(category, "1") == 0)
                 DisplayList(tendinte, DisplaySeries, outputFile);
 
@@ -81,11 +85,16 @@ int main(int argc, char *argv[])
             
             // search through all the lists for the series with the given name
             TSeriesPointer currSeries = (TSeriesPointer) FindElement(all, name, MyFindFunction);
+            // if we find the series
             if(currSeries != NULL)
             {
                 TSeasonPointer newSeason = ReadSeason(inputFile);
                 AddSeason(currSeries, newSeason);
                 fprintf(outputFile,"Serialul %s are un sezon nou.\n", currSeries->name);
+            }
+            else
+            {
+                printf("Serialul nu exista\n");
             }
         }
         else if(strcmp(command, "later") == 0)
@@ -103,22 +112,87 @@ int main(int argc, char *argv[])
                 currSeries->name, watch_later->count);
             }
 
-            // remove the nodes from all the other lits
+            // remove the nodes from all the other lists
             RemoveFromList(&tendinte, currSeries, FindFunctionForTwoNodes);
             RemoveFromList(&documentare, currSeries, FindFunctionForTwoNodes);
             RemoveFromList(&tutoriale, currSeries, FindFunctionForTwoNodes);
 
-            // TODO decrement the other ranks in the top
             RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
+            ReadjustOrder(top10); // decrement the order
         }
         
         else if(strcmp(command, "watch") == 0)
         {
-            printf("dsa");
+            // read the input
+            char name[DIM_MAX];
+            int duration;
+
+            fscanf(inputFile, "%s %d", name, &duration);
+            // check if the series is in the stack
+            TSeriesPointer searchStack = (TSeriesPointer) 
+                                FindElement(currently_watching->top, name, MyFindFunction);
+
+             // find the series in the all list
+            TSeriesPointer currSeries = (TSeriesPointer) FindElement(all, name, MyFindFunction);
+
+            if(currSeries == NULL) // couldn't find the series
+            {
+                printf("Serialul nu exista\n");
+                continue;
+            }
+            // if the series is not the stack
+            if(searchStack == NULL)
+            {
+                // move the series to the stack
+                PushStack(currently_watching, currSeries);
+
+                // remove the series from the other lists
+                // remove the nodes from all the other lists
+                RemoveFromList(&tendinte, currSeries, FindFunctionForTwoNodes);
+                RemoveFromList(&documentare, currSeries, FindFunctionForTwoNodes);
+                RemoveFromList(&tutoriale, currSeries, FindFunctionForTwoNodes);
+                RemoveFromQueueList(watch_later, currSeries, FindFunctionForTwoNodes);
+
+
+                RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
+                ReadjustOrder(top10); // decrement the order
+            }
+
+            // Watch x duration from the series
+            int result = WatchSeries(currSeries, duration, outputFile);
+
+            // we watched the whole series
+            if(result == 1)
+            {
+                // eliminate the series from the stack
+                void *info = PopStack(currently_watching);
+                // and add it to the history stack
+                PushStack(history, info);
+            }
+            
         }
         else if(strcmp(command, "add_top") == 0)
         {
-            printf("dsad");
+            int position;
+            // this read will put the position in the id field
+            TSeriesPointer newSeries = ReadSeries(inputFile);
+
+            // modify the id and nrOrder fields with the correct information
+            int aux = newSeries->id;
+            newSeries->id = 4;
+            newSeries->nrOrder = aux;
+
+            // add to top 10 list
+            OrdererdInsert(&top10, newSeries, CompareSeriesFromTop, &position);
+            ReadjustOrder(top10);
+
+            // add to the all list
+            OrdererdInsert(&all, newSeries, CompareSeries, &position);
+
+            // Display the new top10 list
+            fprintf(outputFile, "Categoria top10: ");
+            DisplayList(top10, DisplaySeries, outputFile);
+             
         }
     }
 
@@ -133,6 +207,80 @@ int main(int argc, char *argv[])
     ClearStack(history, FreeSeries);
     fclose(inputFile);
     fclose(outputFile);
+    return 0;
+}
+
+void ReadjustOrder(TNodePointer node)
+{
+    int correctIndex = 1;
+
+    while(node != NULL)
+    {
+        TSeriesPointer seriesInfo = (TSeriesPointer) node->info;
+        seriesInfo->nrOrder = correctIndex;
+
+        correctIndex++;
+        node = node->next;
+    }
+}
+
+int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)
+{
+    int aux;;
+
+    // get the seasons queue
+    TQueuePointer seasonQueue = series->seasons;
+
+    // go through every season in the queue
+
+    while(!IsEmptyQueue(seasonQueue))
+    {
+        // get the current season
+        TSeasonPointer currSeason = (TSeasonPointer) QueueTop(seasonQueue);
+
+        // get the episodes queue for the season
+        TQueuePointer episodeQueue = currSeason->episodes;
+
+        while(!IsEmptyQueue(episodeQueue))
+        {
+            // get the current episode
+            TEpisodePointer currEpisode = (TEpisodePointer) QueueTop(episodeQueue);
+            aux = currEpisode->duration;
+            currEpisode->duration -= duration;
+
+            if(currEpisode->duration <= 0)
+            {
+                // eliminate the episode from the queue
+                QueuePop(episodeQueue);
+            }
+
+            duration-= aux;
+            if(duration <= 0)
+            {
+                break;
+            }
+        }
+
+        // if we watched every episode from the season
+        if(IsEmptyQueue(episodeQueue))
+        {
+            // eliminate the season from the queue
+            QueuePop(seasonQueue);
+        }
+
+        if(duration <= 0)
+        {
+            break;
+        }
+    }
+
+    // if we watched the whole series
+    if(duration <= 0 && IsEmptyQueue(seasonQueue))
+    {
+        // remove the series from the watching_stack
+        fprintf(outputFile, "Serialul %s a fost vizionat integral.\n",series->name);
+        return 1;
+    }
     return 0;
 }
 
@@ -162,6 +310,14 @@ int FindFunctionForTwoNodes(void *a, void *b)
     return 0;
 }
 
+int CompareSeriesFromTop(void *seriesA, void *seriesB)
+{
+    TSeriesPointer seriesA_info = (TSeriesPointer) seriesA;
+    TSeriesPointer seriesB_info = (TSeriesPointer) seriesB;
+
+    return seriesB_info->nrOrder - seriesA_info->nrOrder;
+}
+
 int CompareSeries(void * seriesA, void *seriesB)
 {
     TSeriesPointer seriesA_info = (TSeriesPointer) seriesA;
@@ -170,11 +326,7 @@ int CompareSeries(void * seriesA, void *seriesB)
     {
         return strcmp(seriesB_info->name, seriesA_info->name);
     }
-    if(seriesA_info->rating <= seriesB_info->rating)
-    {
-        return -1;
-    }
-    return 1;
+    return seriesA_info->rating - seriesB_info->rating;
 }
 
 TSeriesPointer ReadSeries(FILE *inputFile)

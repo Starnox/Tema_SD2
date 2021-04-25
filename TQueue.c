@@ -15,6 +15,15 @@ int IsEmptyQueue(TQueuePointer queue)
     return (queue->back == NULL);
 }
 
+void* QueueTop(TQueuePointer queue)
+{
+    if(queue != NULL)
+    {
+        return queue->front->info;
+    }
+    return NULL;
+}
+
 int QueuePush(TQueuePointer queue, void *info)
 {
     TNodePointer node = InitialiseNode(info);
@@ -65,6 +74,17 @@ void* QueuePop(TQueuePointer queue)
         return info;
     }
     return NULL;
+}
+
+void RemoveFromQueueList(TQueuePointer queue, void *info, FindFunction findFunction)
+{
+    RemoveFromList(&(queue->front), info, findFunction);
+    queue->count--;
+    if(queue->count == 0)
+    {
+        queue->front = NULL;
+        queue->back = NULL;
+    }
 }
 
 void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc)

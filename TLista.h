@@ -27,4 +27,6 @@ void* FindElement(TNodePointer node, void *toFind, FindFunction findFunction);
 
 void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction);
 
+int InsertEnd(TNodePointer *node, void *info);
+
 #endif

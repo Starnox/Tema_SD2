@@ -15,6 +15,7 @@ int QueuePush(TQueuePointer queue, void *info); // 1 for succes 0 for failure
 void* QueuePop(TQueuePointer queue);
 void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc);
 void DisplayQueue(TQueuePointer queue, ShowInfoFunction showFunc, FILE *outputFILE);
-
+void* QueueTop(TQueuePointer queue);
+void RemoveFromQueueList(TQueuePointer queue, void *info, FindFunction findFunction);
 
 #endif

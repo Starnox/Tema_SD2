@@ -50,10 +50,7 @@ void* FindElement(TNodePointer node, void *toFind,  FindFunction findFunction)
 
 void DisplayList(TNodePointer node, ShowInfoFunction showFunc, FILE *outputFILE)
 {
-    if(node != NULL)
-    {
-        fprintf(outputFILE,"[");
-    }
+    fprintf(outputFILE,"[");
     while(node != NULL)
     {
         showFunc(outputFILE, node->info);
@@ -92,6 +89,32 @@ void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction)
         aux = aux->next;
     }
 
+}
+
+int InsertEnd(TNodePointer *node, void *info)
+{
+    TNodePointer newNode = InitialiseNode(info);
+
+    if(newNode == NULL)
+    {
+        printf("Eroare la alocare nod!\n");
+        return 0;
+    }
+
+    if(*node == NULL)
+    {
+        *node = newNode;
+    }
+    else
+    {
+        TNodePointer aux = *node;
+        while(aux->next != NULL) // go to the last element
+        {
+            aux = aux->next;
+        }
+        aux->next = newNode;
+    }
+    return 1;
 }
 
 int OrdererdInsert(TNodePointer *node, void *info, CompareFunction compFunc, int *position)
