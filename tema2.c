@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
                 printf("Serialul nu exista\n");
                 continue;
             }
-            // if the series is not the stack
+            // if the series is not in the stack
             if(searchStack == NULL)
             {
                 // move the series to the stack
@@ -157,6 +157,12 @@ int main(int argc, char *argv[])
                 RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
                 ReadjustOrder(top10); // decrement the order
             }
+            else
+            {
+                // must bring the series to the top of the stack
+                RemoveFromStackList(currently_watching, searchStack, FindFunctionForTwoNodes);
+                PushStack(currently_watching, searchStack);
+            }
 
             // Watch x duration from the series
             int result = WatchSeries(currSeries, duration, outputFile);
@@ -165,9 +171,9 @@ int main(int argc, char *argv[])
             if(result == 1)
             {
                 // eliminate the series from the stack
-                void *info = PopStack(currently_watching);
+                PopStack(currently_watching);
                 // and add it to the history stack
-                PushStack(history, info);
+                PushStack(history, currSeries);
             }
             
         }
@@ -182,12 +188,20 @@ int main(int argc, char *argv[])
             newSeries->id = 4;
             newSeries->nrOrder = aux;
 
-            // add to top 10 list
-            OrdererdInsert(&top10, newSeries, CompareSeriesFromTop, &position);
-            ReadjustOrder(top10);
+            if(aux > 10)
+                continue;
 
             // add to the all list
             OrdererdInsert(&all, newSeries, CompareSeries, &position);
+
+            // add to top 10 list
+            OrdererdInsert(&top10, newSeries, CompareSeriesFromTop, &position);
+
+            // Check if there are more than 10 series in the top
+            VerifyIntegrity(top10);
+            ReadjustOrder(top10);
+
+            
 
             // Display the new top10 list
             fprintf(outputFile, "Categoria top10: ");
@@ -224,6 +238,25 @@ void ReadjustOrder(TNodePointer node)
     }
 }
 
+void VerifyIntegrity(TNodePointer node)
+{
+    TNodePointer pre = NULL;
+    int index = 0;
+    while(node != NULL)
+    {
+        index++;
+        if(index == 11)
+        {
+            // delete this node and free the info
+            DestroyNode(&node, FreeSeries, 0);
+            pre->next = NULL;
+            return;
+        }
+        pre = node;
+        node = node->next;
+    }
+}
+
 int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)
 {
     int aux;;
@@ -251,7 +284,10 @@ int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)
             if(currEpisode->duration <= 0)
             {
                 // eliminate the episode from the queue
-                QueuePop(episodeQueue);
+                void *info = QueuePop(episodeQueue);
+
+                // free the episode
+                free(info);
             }
 
             duration-= aux;
@@ -265,7 +301,8 @@ int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)
         if(IsEmptyQueue(episodeQueue))
         {
             // eliminate the season from the queue
-            QueuePop(seasonQueue);
+            void *info =QueuePop(seasonQueue);
+            FreeSeason(info);
         }
 
         if(duration <= 0)
@@ -275,7 +312,7 @@ int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile)
     }
 
     // if we watched the whole series
-    if(duration <= 0 && IsEmptyQueue(seasonQueue))
+    if(IsEmptyQueue(seasonQueue))
     {
         // remove the series from the watching_stack
         fprintf(outputFile, "Serialul %s a fost vizionat integral.\n",series->name);
@@ -326,7 +363,9 @@ int CompareSeries(void * seriesA, void *seriesB)
     {
         return strcmp(seriesB_info->name, seriesA_info->name);
     }
-    return seriesA_info->rating - seriesB_info->rating;
+    if(seriesA_info->rating < seriesB_info->rating)
+        return -1;
+    return 1;
 }
 
 TSeriesPointer ReadSeries(FILE *inputFile)

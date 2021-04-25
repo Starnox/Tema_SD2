@@ -62,19 +62,19 @@ void DisplayList(TNodePointer node, ShowInfoFunction showFunc, FILE *outputFILE)
 }
 
 // remove from the list the node with the specified info without freeing the info
-void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction)
+int RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction)
 {
     // search for the node
     TNodePointer aux = *node;
     if(aux == NULL)
-        return;
+        return 0;
 
     // if it is the first node
     if(findFunction(aux->info, info) == 1)
     {
         *node = (*node)->next;
         free(aux);
-        return;
+        return 1;
     }
 
     while(aux->next != NULL)
@@ -84,11 +84,11 @@ void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction)
             TNodePointer u = aux->next;
             aux->next = aux->next->next;
             free(u);
-            return;
+            return 1;
         }
         aux = aux->next;
     }
-
+    return 0;
 }
 
 int InsertEnd(TNodePointer *node, void *info)

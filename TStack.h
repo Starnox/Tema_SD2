@@ -15,5 +15,6 @@ int IsEmptyStack(TStackPointer stack);
 void* PopStack(TStackPointer stack);
 void ClearStack(TStackPointer stack, FreeInfoFunction freeFunc);
 void DisplayStack(TStackPointer stack, ShowInfoFunction showFunc, FILE *outputFILE);
+void RemoveFromStackList(TStackPointer stack, void *info, FindFunction findFunction);
 
 #endif

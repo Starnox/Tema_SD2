@@ -26,13 +26,31 @@ int PushStack(TStackPointer stack, void *info)
     return 1;
 }
 
+void RemoveFromStackList(TStackPointer stack, void *info, FindFunction findFunction)
+{
+    int status = RemoveFromList(&(stack->top), info, findFunction);
+    if(status == 1)
+    {
+        stack->count--;
+        if(stack->count == 0)
+        {
+            stack->count = 0;
+            stack->top = NULL;
+        }
+    }
+}
+
 int IsEmptyStack(TStackPointer stack)
 {
+    if(stack == NULL)
+        return 1;
     return (stack->top == NULL);
 }
 
 void* PopStack(TStackPointer stack)
 {
+    if(stack == NULL)
+        return NULL;
     if(!IsEmptyStack(stack))
     {
         TNodePointer aux;

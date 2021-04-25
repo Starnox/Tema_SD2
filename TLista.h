@@ -25,7 +25,8 @@ int OrdererdInsert(TNodePointer *node, void *info, CompareFunction compFunc, int
 
 void* FindElement(TNodePointer node, void *toFind, FindFunction findFunction);
 
-void RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction);
+// (1 if it could remove the element, 0 otherwise)
+int RemoveFromList(TNodePointer *node, void *info, FindFunction findFunction);
 
 int InsertEnd(TNodePointer *node, void *info);
 

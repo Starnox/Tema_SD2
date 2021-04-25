@@ -12,7 +12,9 @@ TQueuePointer InitialiseQueue()
 
 int IsEmptyQueue(TQueuePointer queue)
 {
-    return (queue->back == NULL);
+    if(queue == NULL)
+        return 1;
+    return (queue->front == NULL);
 }
 
 void* QueueTop(TQueuePointer queue)
@@ -59,12 +61,17 @@ void DisplayQueue(TQueuePointer queue, ShowInfoFunction showFunc, FILE *outputFI
 // just returns the info, the memory needs to be free manually
 void* QueuePop(TQueuePointer queue)
 {
+    if(queue == NULL)
+        return NULL;
     if(!IsEmptyQueue(queue))
     {
         void *info = queue->front->info;
         TNodePointer aux = queue->front;
         queue->front = queue->front->next;
         queue->count--;
+        if(queue->count < 0)
+            queue->count = 0;
+
         if(queue->front == NULL) // if the queue is empty
         {
             queue->back = NULL;
@@ -78,12 +85,26 @@ void* QueuePop(TQueuePointer queue)
 
 void RemoveFromQueueList(TQueuePointer queue, void *info, FindFunction findFunction)
 {
-    RemoveFromList(&(queue->front), info, findFunction);
-    queue->count--;
-    if(queue->count == 0)
+    int status = RemoveFromList(&(queue->front), info, findFunction);
+    if(status == 1)
     {
-        queue->front = NULL;
-        queue->back = NULL;
+        queue->count--;
+        if(queue->count <= 0)
+        {
+            queue->count = 0;
+            queue->front = NULL;
+            queue->back = NULL;
+        }
+        else
+        {
+            // reput queue->back in the correct position
+            TNodePointer aux = queue->front;
+            while(aux->next != NULL)
+            {
+                aux = aux->next;
+            }
+            queue->back = aux;
+        }
     }
 }
 

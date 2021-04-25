@@ -45,5 +45,5 @@ TSeriesPointer InitialiseSeries(int id, char *name, double rating, int nrSeasons
 void DisplaySeries(FILE *outputFILE ,void *series)
 {
     TSeriesPointer seriesInfo = (TSeriesPointer) series;
-    fprintf(outputFILE,"(<%s>, <%.1f>)", seriesInfo->name, seriesInfo->rating);
+    fprintf(outputFILE,"(%s, %.1f)", seriesInfo->name, seriesInfo->rating);
 }
