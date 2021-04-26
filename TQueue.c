@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "TQueue.h"
 
 TQueuePointer InitialiseQueue()
@@ -52,10 +53,22 @@ int QueuePush(TQueuePointer queue, void *info)
 }
 
 
-void DisplayQueue(TQueuePointer queue, ShowInfoFunction showFunc, FILE *outputFILE)
+void DisplayQueue(TQueuePointer *queue, ShowInfoFunction showFunc, FILE *outputFILE)
 {
-    TNodePointer node = queue->front;
-    DisplayList(node, showFunc, outputFILE);
+    TQueuePointer queueCopy = InitialiseQueue(); 
+    // Look for the element in the queue
+    fprintf(outputFILE,"[");
+    while(!IsEmptyQueue(*queue))
+    {
+        void *currentInfo = QueuePop(*queue);
+        showFunc(outputFILE, currentInfo);
+        if(!IsEmptyQueue(*queue))
+           fprintf(outputFILE,", ");
+        QueuePush(queueCopy, currentInfo);
+    }
+    fprintf(outputFILE,"].\n");
+    free(*queue);
+    *queue = queueCopy;
 }
 
 // just returns the info, the memory needs to be free manually
@@ -83,29 +96,23 @@ void* QueuePop(TQueuePointer queue)
     return NULL;
 }
 
-void RemoveFromQueueList(TQueuePointer queue, void *info, FindFunction findFunction)
+void RemoveFromQueueList(TQueuePointer *queue, void *info, FindFunction findFunction)
 {
-    int status = RemoveFromList(&(queue->front), info, findFunction);
-    if(status == 1)
+
+    // queue to save the elements
+    TQueuePointer queueCopy = InitialiseQueue(); 
+    // Look for the element in the queue
+    while(!IsEmptyQueue(*queue))
     {
-        queue->count--;
-        if(queue->count <= 0)
+        void *elem = QueuePop(*queue);
+        // we push the elements not equal to the searched one
+        if(findFunction(elem, info) != 1)
         {
-            queue->count = 0;
-            queue->front = NULL;
-            queue->back = NULL;
-        }
-        else
-        {
-            // reput queue->back in the correct position
-            TNodePointer aux = queue->front;
-            while(aux->next != NULL)
-            {
-                aux = aux->next;
-            }
-            queue->back = aux;
+            QueuePush(queueCopy, elem);
         }
     }
+    free(*queue);
+    *queue = queueCopy;
 }
 
 void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc)

@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "TSeries.h"
 #include "TQueue.h"
 #include "TStack.h"

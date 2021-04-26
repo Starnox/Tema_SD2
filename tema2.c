@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "tema2.h"
 
 int main(int argc, char *argv[])
@@ -43,7 +44,8 @@ int main(int argc, char *argv[])
             else if(newSeries->id == 3)
                 OrdererdInsert(&tutoriale, newSeries, CompareSeries, &position);
 
-            fprintf(outputFile,"Serialul %s a fost adaugat la pozitia %d.\n", newSeries->name, position);
+            fprintf(outputFile,"Serialul %s a fost adaugat la pozitia %d.\n",
+                     newSeries->name, position);
             
             // insert in the all list which contains all the series
             OrdererdInsert(&all, newSeries, CompareSeries, &position);
@@ -69,13 +71,13 @@ int main(int argc, char *argv[])
                 DisplayList(top10, DisplaySeries, outputFile);
 
             else if(strcmp(category, "later") == 0)
-                DisplayQueue(watch_later, DisplaySeries, outputFile);
+                DisplayQueue(&watch_later, DisplaySeries, outputFile);
 
             else if(strcmp(category, "watching") == 0)
-                DisplayStack(currently_watching, DisplaySeries, outputFile);
+                DisplayStack(&currently_watching, DisplaySeries, outputFile);
 
             else if(strcmp(category, "history") == 0)
-                DisplayStack(history, DisplaySeries, outputFile);
+                DisplayStack(&history, DisplaySeries, outputFile);
 
         }
         else if(strcmp(command, "add_sez") == 0)
@@ -130,7 +132,7 @@ int main(int argc, char *argv[])
             fscanf(inputFile, "%s %d", name, &duration);
             // check if the series is in the stack
             TSeriesPointer searchStack = (TSeriesPointer) 
-                                FindElement(currently_watching->top, name, MyFindFunction);
+                                FindElementInStack(&currently_watching, name, MyFindFunction);
 
              // find the series in the all list
             TSeriesPointer currSeries = (TSeriesPointer) FindElement(all, name, MyFindFunction);
@@ -151,7 +153,7 @@ int main(int argc, char *argv[])
                 RemoveFromList(&tendinte, currSeries, FindFunctionForTwoNodes);
                 RemoveFromList(&documentare, currSeries, FindFunctionForTwoNodes);
                 RemoveFromList(&tutoriale, currSeries, FindFunctionForTwoNodes);
-                RemoveFromQueueList(watch_later, currSeries, FindFunctionForTwoNodes);
+                RemoveFromQueueList(&watch_later, currSeries, FindFunctionForTwoNodes);
 
 
                 RemoveFromList(&top10, currSeries, FindFunctionForTwoNodes);
@@ -160,7 +162,7 @@ int main(int argc, char *argv[])
             else
             {
                 // must bring the series to the top of the stack
-                RemoveFromStackList(currently_watching, searchStack, FindFunctionForTwoNodes);
+                RemoveFromStackList(&currently_watching, searchStack, FindFunctionForTwoNodes);
                 PushStack(currently_watching, searchStack);
             }
 

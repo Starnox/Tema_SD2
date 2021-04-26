@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "TLista.h"
 
 void DestroyNode(TNodePointer *node, FreeInfoFunction freeFunc, int destroyInfo)

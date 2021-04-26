@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "TStack.h"
 
 
@@ -26,18 +27,31 @@ int PushStack(TStackPointer stack, void *info)
     return 1;
 }
 
-void RemoveFromStackList(TStackPointer stack, void *info, FindFunction findFunction)
+void ReverseStack(TStackPointer *stack)
 {
-    int status = RemoveFromList(&(stack->top), info, findFunction);
-    if(status == 1)
+    TStackPointer stackCopy = InitialiseStack();
+    while(!IsEmptyStack(*stack))
     {
-        stack->count--;
-        if(stack->count == 0)
-        {
-            stack->count = 0;
-            stack->top = NULL;
-        }
+        void *currentInfo = PopStack(*stack);
+        PushStack(stackCopy, currentInfo);
     }
+    free(*stack);
+    *stack = stackCopy;
+}
+
+void RemoveFromStackList(TStackPointer *stack, void *info, FindFunction findFunction)
+{
+    TStackPointer stackCopy = InitialiseStack();
+
+    while(!IsEmptyStack(*stack))
+    {
+        void *currentInfo = PopStack(*stack);
+        if(findFunction(currentInfo, info) != 1)
+            PushStack(stackCopy, currentInfo);
+    }
+    free(*stack);
+    ReverseStack(&stackCopy);
+    *stack = stackCopy;
 }
 
 int IsEmptyStack(TStackPointer stack)
@@ -45,6 +59,25 @@ int IsEmptyStack(TStackPointer stack)
     if(stack == NULL)
         return 1;
     return (stack->top == NULL);
+}
+
+void* FindElementInStack(TStackPointer *stack, void *info,
+                                 FindFunction findFunction)
+{
+    TStackPointer stackCopy = InitialiseStack();
+    void *res = NULL;
+
+    while(!IsEmptyStack(*stack))
+    {
+        void *currentInfo = PopStack(*stack);
+        if(findFunction(currentInfo, info) == 1)
+            res = currentInfo;
+        PushStack(stackCopy, currentInfo);
+    }
+    free(*stack);
+    ReverseStack(&stackCopy);
+    *stack = stackCopy;
+    return res;
 }
 
 void* PopStack(TStackPointer stack)
@@ -68,10 +101,24 @@ void* PopStack(TStackPointer stack)
     
 }
 
-void DisplayStack(TStackPointer stack, ShowInfoFunction showFunc, FILE *outputFILE)
+void DisplayStack(TStackPointer *stack, ShowInfoFunction showFunc, FILE *outputFILE)
 {
-    TNodePointer node = stack->top;
-    DisplayList(node, showFunc, outputFILE);
+    TStackPointer stackCopy = InitialiseStack();
+
+    fprintf(outputFILE,"[");
+    while(!IsEmptyStack(*stack))
+    {
+        void *currentInfo = PopStack(*stack);
+        showFunc(outputFILE, currentInfo);
+        if(!IsEmptyStack(*stack))
+           fprintf(outputFILE,", ");
+        
+        PushStack(stackCopy, currentInfo);
+    }
+    fprintf(outputFILE,"].\n");
+    free(*stack);
+    ReverseStack(&stackCopy);
+    *stack = stackCopy;
 }
 
 void ClearStack(TStackPointer stack, FreeInfoFunction freeFunc)

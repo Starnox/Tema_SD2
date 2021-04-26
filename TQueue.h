@@ -1,3 +1,4 @@
+/* MIHAILEACU Eduard-Florin - 312CB */
 #include "TLista.h"
 
 #ifndef TQUEUE_H
@@ -14,8 +15,10 @@ int IsEmptyQueue(TQueuePointer queue); // check if empty
 int QueuePush(TQueuePointer queue, void *info); // 1 for succes 0 for failure
 void* QueuePop(TQueuePointer queue);
 void ClearQueue(TQueuePointer queue, FreeInfoFunction freeFunc);
-void DisplayQueue(TQueuePointer queue, ShowInfoFunction showFunc, FILE *outputFILE);
+void DisplayQueue(TQueuePointer *queue, ShowInfoFunction showFunc, FILE *outputFILE);
 void* QueueTop(TQueuePointer queue);
-void RemoveFromQueueList(TQueuePointer queue, void *info, FindFunction findFunction);
+void RemoveFromQueueList(TQueuePointer *queue, void *info, FindFunction findFunction);
+
+void CopyQueue(TQueuePointer destination, TQueuePointer source);
 
 #endif
