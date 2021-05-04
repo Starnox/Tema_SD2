@@ -1,3 +1,4 @@
+/* MIHAILESCU Eduard-Florin - 312CB */
 #include "TSeason.h"
 
 void FreeSeason(void* info)

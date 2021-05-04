@@ -1,4 +1,4 @@
-/* MIHAILEACU Eduard-Florin - 312CB */
+/* MIHAILESCU Eduard-Florin - 312CB */
 #include "TLista.h"
 
 #ifndef TQUEUE_H

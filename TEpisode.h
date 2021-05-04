@@ -1,4 +1,4 @@
-/* MIHAILEACU Eduard-Florin - 312CB */
+/* MIHAILESCU Eduard-Florin - 312CB */
 #include <stdio.h>
 #include <stdlib.h>
 

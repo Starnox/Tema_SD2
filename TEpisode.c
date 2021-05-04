@@ -1,4 +1,4 @@
-/* MIHAILEACU Eduard-Florin - 312CB */
+/* MIHAILESCU Eduard-Florin - 312CB */
 #include "TEpisode.h"
 
 TEpisodePointer InitialiseEpisode(int duration)

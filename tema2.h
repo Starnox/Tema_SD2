@@ -1,4 +1,4 @@
-/* MIHAILEACU Eduard-Florin - 312CB */
+/* MIHAILESCU Eduard-Florin - 312CB */
 #include "TSeries.h"
 #include "TQueue.h"
 #include "TStack.h"
@@ -19,3 +19,26 @@ void ReadjustOrder(TNodePointer node);
 int WatchSeries(TSeriesPointer series, int duration, FILE *outputFile);
 
 TSeriesPointer VerifyIntegrity(TNodePointer node);
+
+void Add(FILE *inputFile, FILE *outputFile, TNodePointer *tendinte, 
+        TNodePointer *documentare, TNodePointer *tutoriale, TNodePointer *all);
+
+
+void Show(FILE *inputFile, FILE *outputFile, TNodePointer *tendinte, 
+        TNodePointer *documentare, TNodePointer *tutoriale, TNodePointer *top10,
+        TQueuePointer *watch_later, TStackPointer *currently_watching,
+        TStackPointer *history);
+
+void Add_Sez(FILE *inputFile, FILE *outputFile, TNodePointer all);
+
+void Later(FILE *inputFile, FILE *outputFile, TNodePointer *tendinte, 
+        TNodePointer *documentare, TNodePointer *tutoriale, TNodePointer *top10,
+        TNodePointer all, TQueuePointer watch_later);
+
+void Watch(FILE *inputFile, FILE *outputFile, TNodePointer *tendinte, 
+        TNodePointer *documentare, TNodePointer *tutoriale, TNodePointer *top10,
+        TNodePointer all, TQueuePointer *watch_later,
+        TStackPointer *currently_watching, TStackPointer *history);
+
+void Add_Top(FILE *inputFile, FILE *outputFile, TNodePointer *all,
+            TNodePointer *residuu, TNodePointer *top10);
